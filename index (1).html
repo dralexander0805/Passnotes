@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Locked Notes App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        #app {
+            background-color: #1e1e1e;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        #notesArea {
+            width: 100%;
+            height: 150px;
+            margin: 0 auto; /* Center the notes typing box */
+            margin-bottom: 10px;
+            border: 1px solid #333;
+            background-color: #2e2e2e;
+            color: #e0e0e0;
+            padding: 10px;
+            overflow-y: auto;
+            border-radius: 4px;
+        }
+        .hidden {
+            display: none;
+        }
+        .toolbar button {
+            margin-right: 5px;
+            background-color: #3a3a3a;
+            border: none;
+            color: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .toolbar button:hover {
+            background-color: #575757;
+        }
+        input[type="password"], .custom-file-input {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background-color: #2e2e2e;
+            color: #e0e0e0;
+            width: calc(100% - 22px);
+        }
+        .custom-file-input {
+            display: none;
+        }
+        .custom-file-label {
+            display: inline-block;
+            background-color: #3a3a3a;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+        }
+        .custom-file-label:hover {
+            background-color: #575757;
+        }
+        button {
+            background-color: #3a3a3a;
+            border: none;
+            color: #e0e0e0;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #575757;
+        }
+        h3 {
+            color: #e0e0e0;
+        }
+        .icon-button {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="loginDiv">
+            <h3>Enter Password</h3>
+            <input type="password" id="passwordInput" placeholder="Password">
+            <button onclick="checkPassword()">Login</button>
+        </div>
+        <div id="notesDiv" class="hidden">
+            <h3>Your Notes</h3>
+            <div class="toolbar">
+                <button class="icon-button" onclick="document.execCommand('bold')"><i class="fas fa-bold"></i></button>
+                <button class="icon-button" onclick="document.execCommand('italic')"><i class="fas fa-italic"></i></button>
+                <button class="icon-button" onclick="document.execCommand('underline')"><i class="fas fa-underline"></i></button>
+            </div>
+            <div id="notesArea" contenteditable="true"></div>
+            <br>
+            <label class="custom-file-label" for="fileInput"><i class="fas fa-file-upload"></i> Choose File</label>
+            <input type="file" id="fileInput" class="custom-file-input" accept=".html">
+            <button onclick="importNotes()"><i class="fas fa-file-import"></i> Import Notes</button>
+            <button onclick="downloadNotes()"><i class="fas fa-file-download"></i> Download Notes</button>
+            <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+    <script>
+        const correctPassword = "yourpassword"; // Set your password here
+        
+        function checkPassword() {
+            const enteredPassword = document.getElementById('passwordInput').value;
+            if (enteredPassword === correctPassword) {
+                document.getElementById('loginDiv').classList.add('hidden');
+                document.getElementById('notesDiv').classList.remove('hidden');
+            } else {
+                alert('Incorrect Password');
+            }
+        }
+
+        function downloadNotes() {
+            const notes = document.getElementById('notesArea').innerHTML;
+            const blob = new Blob([notes], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'notes.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importNotes() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('notesArea').innerHTML = e.target.result;
+                };
+                reader.readAsText(file);
+            } else {
+                alert('Please select a file to import.');
+            }
+        }
+
+        function logout() {
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('notesArea').innerHTML = '';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('loginDiv').classList.remove('hidden');
+            document.getElementById('notesDiv').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
